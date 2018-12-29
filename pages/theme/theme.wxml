@@ -1,0 +1,9 @@
+<!--pages/theme/theme.wxml-->
+<view class="container">
+  <view class="theme-header">
+    <image src="{{themeData.head_img.url}}" mode="aspectFill"></image>
+  </view>
+  <view class="theme-main">
+    <products products="{{themeData.products}}"></products>
+  </view>
+</view>

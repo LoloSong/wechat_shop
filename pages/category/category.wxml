@@ -1,0 +1,22 @@
+<!--pages/category/category.wxml-->
+<view class="container category-container">
+  <view class="category-box">
+    <view class="left-box">
+      <view 
+        class="menu-item {{currentMenuIndex === index ? 'selected' : ''}}"
+        wx:for="{{categoryData}}"
+        wx:key="{{item.id}}"
+        data-id="{{item.id}}"
+        data-index="{{index}}"
+        bindtap="changeCategoty"
+      >
+        {{item.name}}
+      </view>
+    </view>
+    <view class="right-box">
+      <view class="foods-type-box">
+        <category categoryInfo="{{categoryProducts}}"></category>
+      </view>
+    </view>
+  </view>
+</view>
