@@ -1,66 +1,125 @@
 // pages/cart/cart.js
+import Cart from 'cart-model.js'
+const cart = new Cart()
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-    arr: [1, 2, [3, 4, 5]]
+    cartData: [],
+    selectedCounts: 0,
+    selectedTypeCounts: 0,
+    account: 0
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad: function (options) {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
+  onLoad: function(options) {
 
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-
+  onShow() {
+    let cartData = cart.getCartDataFromLocal()
+    // let countsInfo = cart.getCartTotalCounts(true)
+    let calc = this._calcTotalAccountAndCounts(cartData)
+    this.setData({
+      cartData: cartData,
+      selectedCounts: calc.selectedCounts,
+      selectedTypeCounts: calc.selectedTypeCounts,
+      account: calc.account
+    })
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
+  onHide() {
+    cart.execSetStorageSync(this.data.cartData)
   },
 
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
+  toggleSelect(event) {
+    let id = cart.getDataSet(event, 'id')
+    let status = cart.getDataSet(event, 'status')
+    let index = this._getProductIndexById(id)
+    this.data.cartData[index].selectStatus = !status
+    this._resetCartData()
   },
 
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-
+  toggleSelectAll(event) {
+    let status = cart.getDataSet(event, 'status') === 'true'
+    let data = this.data.cartData
+    let len = data.length
+    for (let i = 0; i < len; i++) {
+      data[i].selectStatus = !status
+    }
+    this._resetCartData()
   },
 
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-
+  changeCounts(event) {
+    let id = cart.getDataSet(event, 'id')
+    let type = cart.getDataSet(event, 'type')
+    let index = this._getProductIndexById(id)
+    let counts = 1
+    if (type === 'add') {
+      cart.addCounts(id)
+    } else {
+      counts = -1
+      cart.cutCounts(id)
+    }
+    this.data.cartData[index].counts += counts
+    this._resetCartData()
   },
 
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
+  delete(event) {
+    let id = cart.getDataSet(event, 'id')
+    let index = this._getProductIndexById(id)
+    this.data.cartData.splice(index, 1)
+    this._resetCartData()
+    cart.delete(id)
+  },
 
+  submitOrder () {
+    wx.navigateTo({
+      url: `../order/order?account=${this.data.account}&from=cart`
+    })
+  },
+
+  _calcTotalAccountAndCounts(data) {
+    let len = data.length
+    // 选中商品的总价
+    let account = 0
+    // 选中商品的总个数
+    let selectedCounts = 0
+    // 选中商品种类的个数
+    let selectedTypeCounts = 0
+    let multiple = 100
+
+    for (let i = 0; i < len; i++) {
+      if (data[i].selectStatus) {
+        account += data[i].counts * multiple * Number(data[i].price) * multiple
+        selectedCounts += data[i].counts
+        selectedTypeCounts++
+      }
+    }
+    return {
+      selectedCounts: selectedCounts,
+      selectedTypeCounts: selectedTypeCounts,
+      account: account / (multiple * multiple)
+    }
+  },
+
+  // 根据商品id得到商品所在下标
+  _getProductIndexById(id) {
+    let data = this.data.cartData
+    let len = data.length
+    for (let i = 0; i < len; i++) {
+      if (data[i].id === id) {
+        return i
+      }
+    }
+  },
+
+  _resetCartData() {
+    // 重新计算总金额数量
+    let newData = this._calcTotalAccountAndCounts(this.data.cartData)
+    this.setData({
+      cartData: this.data.cartData,
+      selectedCounts: newData.selectedCounts,
+      selectedTypeCounts: newData.selectedTypeCounts,
+      account: newData.account
+    })
   }
 })

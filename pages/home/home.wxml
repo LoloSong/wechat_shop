@@ -1,4 +1,4 @@
-<!--pages/home/home.wxml-->
+<!-- pages/home/home.wxml -->
 <view class="container">
   <!-- banner -->
   <swiper indicator-dots="true" autoplay="true" class="swiper">
@@ -8,7 +8,6 @@
       </swiper-item>
     </block>
   </swiper>
-
   <!-- theme -->
   <view class="home-main">
     <view class="home-main-theme">
@@ -26,7 +25,6 @@
     </view>
     <view class="home-main-products"></view>
   </view>
-
   <!-- recent -->
   <view class="home-main-products">
     <view class="home-main-header">最近新品</view>

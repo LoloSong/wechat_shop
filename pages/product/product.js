@@ -44,14 +44,27 @@ Page({
   },
 
   onAddingToCartTap () {
-    var tempObj = {}
-    var keys = ['id', 'name', 'main_img_url', 'price']
+    this.addToCart()
+    // let counts = this.data.cartTotalCounts + this.data.productCounts
+    this.setData({
+      cartTotalCounts: cart.getCartTotalCounts()
+    })
+  },
 
+  addToCart () {
+    let tempObj = {}
+    let keys = ['id', 'name', 'main_img_url', 'price']
     for (let key in this.data.product) {
       if (keys.indexOf(key) >= 0) {
         tempObj[key] = this.data.product[key]
       }
     }
     cart.add(tempObj, this.data.productCounts)
+  },
+
+  onCartTap () {
+    wx.switchTab({
+      url: '/pages/cart/cart'
+    })
   }
 })
